@@ -1,0 +1,12 @@
+<h1 id="immich-hardware-transcoding-fix-rootless-podmanrhel">Immich Hardware Transcoding Fix (Rootless Podman/RHEL)</h1>
+<p><strong>Issue:</strong> <code>AssetEncodeVideo</code> jobs failed with <code>Error: No /dev/dri devices found</code>. <strong>Context:</strong> Intel 1245U (QuickSync), Rootless Podman, RHEL. <strong>Cause:</strong> Rootless user not in <code>render</code> group + missing device mapping in compose.</p>
+<h2 id="solution">Solution</h2>
+<ol type="1">
+<li><strong>Host Permissions:</strong>
+<ul>
+<li>Verify device owner: <code>ls -l /dev/dri/renderD128</code> (Output: <code>root render</code>).</li>
+<li>Add user to group: <code>sudo usermod -aG render $USER</code>.</li>
+<li><strong>Action:</strong> Log out and log back in.</li>
+</ul></li>
+<li><strong>Compose Config (<code>docker-compose.yml</code>):</strong> Add <code>devices</code> mapping to both <code>immich-server</code> and <code>immich-machine-learning</code> or similar: ```yaml devices: /dev/dri:/dev/dri</li>
+</ol>
